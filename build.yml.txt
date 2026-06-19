@@ -1,0 +1,33 @@
+name: Cloud Build Tauri EXE
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allows you to trigger the build manually
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Web Dependencies
+        run: npm install
+
+      - name: Build Tauri Package
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__
+          releaseName: 'App v__VERSION__'
+          releaseDraft: true
+          prerelease: false
